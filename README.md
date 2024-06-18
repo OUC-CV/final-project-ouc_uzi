@@ -1,4 +1,4 @@
-![image](https://github.com/OUC-CV/final-project-ouc_uzi/assets/166674227/6722fff2-c633-4bbc-82d3-5b0f602cdb55)[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/8oH8aWc3)
+
 1.绪论
 研究背景
 随着社会经济的快速发展和城市化进程的加速，汽车数量急剧增加，给交通管理和城市安全带来了巨大挑战。车牌识别作为智能交通系统的重要组成部分，对于车辆管理、交通监控、电子收费等应用场景具有重要意义。车牌识别技术能够实现车辆的自动、快速、准确识别，有效提高交通管理的效率和智能化水平。
@@ -21,7 +21,7 @@
 3. 方法具体细节
 3.1 代码实现
 接下来我将从代码的角度来解释这个程序的实现方法。主要功能是对图像进行预处理，以便于车牌识别。
-
+![3-1](https://github.com/OUC-CV/final-project-ouc_uzi/assets/166674227/de13c852-db21-4e49-b510-65c0a85e60bf)
 图3-1
 图3-1导入了必要的库，包括OpenCV（这里为cv2），用于图像处理；
 matplotlib的pyplot模块（plt），用于图像显示；
