@@ -1,0 +1,78 @@
+import cv2
+from matplotlib import pyplot as plt
+import os
+import numpy as np
+from PIL import ImageFont, ImageDraw, Image
+
+# 定义图像显示函数
+def plt_show0(img):
+    b, g, r = cv2.split(img)
+    img = cv2.merge([r, g, b])
+    plt.imshow(img)
+    plt.show()
+
+def plt_show(img):
+    plt.imshow(img, cmap='gray')
+    plt.show()
+
+def gray_guss(image):
+    image = cv2.GaussianBlur(image, (3, 3), 0)
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    return gray_image
+
+def process_image(image_path):
+    # 读取原始图像
+    origin_image = cv2.imread(image_path)
+    if origin_image is None:
+        print(f"Cannot read image {image_path}")
+        return
+
+    # 复制一张图片，在复制图上进行图像操作，保留原图
+    image = origin_image.copy()
+    gray_image = gray_guss(image)
+
+    # 应用 Sobel 算子
+    Sobel_x = cv2.Sobel(gray_image, cv2.CV_16S, 1, 0)
+    absX = cv2.convertScaleAbs(Sobel_x)
+    image = absX
+
+    # 图像阈值化操作——获得二值化图
+    ret, image = cv2.threshold(image, 0, 255, cv2.THRESH_OTSU)
+    plt_show(image)  # 显示灰度图像
+
+    # 形态学操作
+    kernelX = cv2.getStructuringElement(cv2.MORPH_RECT, (30, 10))
+    image = cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernelX, iterations=1)
+    plt_show(image)  # 显示闭操作后的图像
+
+    # 腐蚀和膨胀操作
+    kernelX = cv2.getStructuringElement(cv2.MORPH_RECT, (50, 1))
+    kernelY = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 20))
+    image = cv2.dilate(image, kernelX)
+    image = cv2.erode(image, kernelX)
+    image = cv2.erode(image, kernelY)
+    image = cv2.dilate(image, kernelY)
+    image = cv2.medianBlur(image, 21)
+    plt_show(image)  # 显示最终处理后的图像
+
+    # 轮廓检测
+    contours, hierarchy = cv2.findContours(image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    for item in contours:
+        rect = cv2.boundingRect(item)
+        x, y, weight, height = rect
+        # 根据轮廓的形状特点，确定车牌的轮廓位置并截取图像
+        if (weight > (height * 3)) and (weight < (height * 4.5)):
+            crop_image = origin_image[y:y + height, x:x + weight]
+            plt_show0(crop_image)  # 显示截取的车牌区域
+            break  # 只显示找到的第一个车牌区域
+
+def main(image_folder):
+    # 遍历文件夹中的所有图片
+    for filename in os.listdir(image_folder):
+        if filename.lower().endswith((".png", ".jpg", ".jpeg")):  # 支持多种图片格式
+            image_path = os.path.join(image_folder, filename)
+            process_image(image_path)
+
+# 调用主函数，传入包含图片的文件夹路径
+image_folder = './image'  # 替换为你的图片文件夹路径
+main(image_folder)
